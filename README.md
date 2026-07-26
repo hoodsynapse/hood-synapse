@@ -80,6 +80,21 @@ npx hoodsynapse status           # what the index holds
 
 Add `--json` to any command to pipe into `jq`.
 
+## Clients
+
+| Language | Use it |
+| --- | --- |
+| **CLI** | `npx hoodsynapse stats` — [npm](https://www.npmjs.com/package/hoodsynapse) |
+| **Python** | [`clients/python`](clients/python) — standard library only, no dependencies |
+| **Anything else** | Plain HTTP + JSON. `curl`, `fetch`, `requests` — it all works. |
+
+```python
+from hoodsynapse import HoodSynapse
+
+hs = HoodSynapse()
+print(hs.stats()["latestBlock"])
+```
+
 ## How the index works
 
 Robinhood Chain produces roughly **10 blocks per second** (~864k per day), and the public
@@ -107,6 +122,8 @@ api/                serverless functions (the HTTP API + indexer)
   _lib.js           RPC helpers, response shaping
   _db.js            database pool
   cron/             the indexer
+clients/python/     Python client, standard library only
+css/                stylesheets
 db/schema.sql       tables and the daily rollup
 assets/             brand assets
 index.html          landing page
