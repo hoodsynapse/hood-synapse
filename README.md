@@ -124,6 +124,7 @@ api/                serverless functions (the HTTP API + indexer)
   cron/             the indexer
 clients/python/     Python client, standard library only
 css/                stylesheets
+js/                 browser scripts
 db/schema.sql       tables and the daily rollup
 assets/             brand assets
 index.html          landing page
