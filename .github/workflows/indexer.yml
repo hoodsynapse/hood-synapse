@@ -1,0 +1,24 @@
+name: Hood Synapse Indexer
+
+# Keeps our own index of Robinhood Chain moving forward.
+# GitHub's shortest cron is 5 minutes; each tick fires several passes
+# so the index keeps pace with a ~4s chain.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Pull new blocks
+        run: |
+          for i in $(seq 1 12); do
+            echo "--- pass $i ---"
+            curl -s --max-time 60 https://hoodsynapse.xyz/api/cron \
+              | head -c 300 || echo "(request failed, continuing)"
+            echo ""
+            sleep 20
+          done

@@ -1,0 +1,9 @@
+{
+  "name": "hood-synapse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Live data and developer tooling for Robinhood Chain",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

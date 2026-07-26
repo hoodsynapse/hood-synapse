@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1180">
+<meta name="virtual-protocol-site-verification" content="8df04a5b834ed065c4e9398f53bbe7fe" />
+<title>Reference — Hood Synapse</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="description" content="Developer reference for Robinhood Chain: network parameters, JSON-RPC methods, Arbitrum Orbit internals, and runnable recipes.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hoodsynapse.xyz/docs">
+<meta property="og:title" content="Reference - Hood Synapse">
+<meta property="og:description" content="Developer reference for Robinhood Chain: RPC methods, Arbitrum Orbit internals, and runnable recipes.">
+<meta property="og:image" content="https://hoodsynapse.xyz/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@hoodsynapse">
+<meta name="twitter:title" content="Reference - Hood Synapse">
+<meta name="twitter:description" content="Developer reference for Robinhood Chain: RPC methods, Arbitrum Orbit internals, and runnable recipes.">
+<meta name="twitter:image" content="https://hoodsynapse.xyz/assets/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A08;--bg2:#050505;--panel:#050505;--code:#050505;
+--bd:#242420;--bdh:#3A3A2E;--y:#D8F500;--yd:#A8BF00;
+--tx:#EDEDE4;--dim:#9C9C90;--ft:#62625A;--mono:'IBM Plex Mono',ui-monospace,monospace;}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth}
+body{max-height:1000000px}
+html{background:var(--bg);}
+body{background:transparent;color:var(--tx);font-family:var(--mono);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--y);color:#0A0A08}
+
+/* ===== top bar ===== */
+.bar{position:sticky;top:0;z-index:60;background:rgba(10,10,8,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd)}
+.bar-in{max-width:1500px;margin:0 auto;padding:0 30px;display:flex;align-items:center;gap:18px;height:58px}
+.lg{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;letter-spacing:-.02em}
+.lg svg{width:24px;height:24px}
+.lg i{font-style:normal;color:var(--ft);font-weight:500}
+.bar-r{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--ft)}
+.blk{display:inline-flex;align-items:center;gap:7px;color:var(--dim)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--y);box-shadow:0 0 0 3px rgba(216,245,0,.15);animation:bp 1.4s steps(1) infinite}
+@keyframes bp{50%{opacity:.25}}
+.hm{font-size:12.5px;color:var(--dim);border:1px solid var(--bdh);border-radius:6px;padding:7px 13px}
+.hm:hover{color:var(--y);border-color:var(--y)}
+
+/* ===== tab rail (ganti sidebar) ===== */
+.rail{position:sticky;top:58px;z-index:55;background:var(--bg2);border-bottom:1px solid var(--bd);overflow-x:auto}
+.rail-in{max-width:1500px;margin:0 auto;padding:0 30px;display:flex;gap:0;min-width:max-content}
+.rail a{position:relative;font-size:12.5px;color:var(--ft);padding:13px 18px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.rail a:hover{color:var(--dim)}
+.rail a.on{color:var(--y);border-bottom-color:var(--y)}
+.rail .sep{width:1px;background:var(--bd);margin:9px 10px}
+
+/* ===== page head ===== */
+.top{border-bottom:1px solid var(--bd);background:
+  linear-gradient(180deg,rgba(216,245,0,.045),transparent 70%)}
+.top-in{max-width:1500px;margin:0 auto;padding:52px 30px 44px;display:grid;grid-template-columns:1fr 320px;gap:60px;align-items:end}
+h1{font-size:clamp(28px,3.6vw,40px);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px}
+.top p{color:var(--dim);font-size:14px;line-height:1.8;max-width:600px}
+.meta{border:1px solid var(--bd);border-radius:9px;background:var(--panel);overflow:hidden}
+.meta div{display:flex;gap:14px;padding:9px 14px;font-size:12px;border-bottom:1px solid rgba(36,36,32,.7)}
+.meta div:last-child{border:none}
+.meta span:first-child{color:var(--ft);width:82px;flex-shrink:0}
+.meta span:last-child{color:var(--tx);margin-left:auto;text-align:right}
+.meta b{color:var(--y);font-weight:600}
+
+/* ===== split rows: prose kiri | kode kanan ===== */
+.doc{max-width:1500px;margin:0 auto;padding:0 30px}
+.grp{border-bottom:1px solid var(--bd);padding:14px 0 34px}
+.grp-h{display:flex;align-items:baseline;gap:14px;padding:26px 0 6px;scroll-margin-top:120px}
+.grp-h .gn{font-size:11px;letter-spacing:.18em;color:var(--y)}
+.grp-h h2{font-size:21px;font-weight:700;letter-spacing:-.02em}
+.grp-h .gd{margin-left:auto;font-size:12px;color:var(--ft)}
+
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:56px;
+  padding:30px 0;border-top:1px solid rgba(36,36,32,.55);scroll-margin-top:130px}
+.row:first-of-type{border-top:none}
+.L{min-width:0;padding-top:2px}
+.R{min-width:0}
+.R.stick{position:sticky;top:130px;align-self:start}
+.sig{display:inline-block;font-size:14.5px;font-weight:700;color:var(--y);margin-bottom:10px;letter-spacing:-.01em}
+.sig.plain{color:var(--tx)}
+.tag{display:inline-block;font-size:10px;letter-spacing:.12em;color:var(--ft);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.L p{color:var(--dim);font-size:13.8px;line-height:1.85;margin-bottom:11px}
+.L p b{color:var(--tx);font-weight:600}
+.L ul{color:var(--dim);font-size:13.5px;line-height:1.8;margin:0 0 12px 17px}
+.L li{margin-bottom:5px}
+.L li b{color:var(--tx)}
+code{font-family:var(--mono);background:var(--panel);border:1px solid var(--bd);border-radius:4px;padding:1px 5px;font-size:12.5px;color:var(--yd)}
+.prm{margin-top:14px;border-top:1px dashed var(--bd);padding-top:12px}
+.prm .ph{font-size:10.5px;letter-spacing:.14em;color:var(--ft);margin-bottom:8px}
+.prm div{display:flex;gap:12px;font-size:12.5px;margin-bottom:5px}
+.prm .pk{color:var(--y);flex-shrink:0;min-width:100px}
+.prm .pv{color:var(--dim)}
+
+.cw{border:1px solid var(--bd);border-radius:9px;overflow:hidden;background:var(--code)}
+.cw + .cw{margin-top:8px}
+.ch{display:flex;align-items:center;gap:9px;padding:8px 13px;background:var(--panel);border-bottom:1px solid var(--bd);font-size:10.5px;letter-spacing:.13em;color:var(--ft)}
+.ch .lg2{margin-left:auto;letter-spacing:0;color:var(--yd)}
+.cw pre{padding:13px;overflow-x:auto;font-size:12px;line-height:1.7}
+.cw code{background:none;border:none;padding:0;color:#D2D2C4}
+.c{color:var(--ft)} .s{color:var(--y)} .k{color:#93CDF5} .n{color:#E8B96A}
+
+.warn{border-left:2px solid #FF8A3D;background:rgba(255,138,61,.05);padding:11px 15px;margin-top:14px;border-radius:0 7px 7px 0;font-size:12.5px;color:var(--dim);line-height:1.75}
+.warn b{color:#FF8A3D}
+.info{border-left:2px solid var(--y);background:rgba(216,245,0,.04);padding:11px 15px;margin-top:14px;border-radius:0 7px 7px 0;font-size:12.5px;color:var(--dim);line-height:1.75}
+.info b{color:var(--y)}
+
+/* ===== footer ===== */
+footer{border-top:1px solid var(--bd);margin-top:10px}
+.f-in{max-width:1500px;margin:0 auto;padding:30px 30px 46px}
+.f-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ft)}
+.f-top .lg{font-size:14px}
+.f-x{margin-left:auto;display:inline-flex;align-items:center;gap:8px;color:var(--dim)}
+.f-x:hover{color:var(--y)}
+.f-x svg{width:14px;height:14px}
+.disc{margin-top:18px;padding-top:16px;border-top:1px solid var(--bd);font-size:11px;color:var(--ft);line-height:1.9}
+
+@media(max-width:600px){
+  .top-in{grid-template-columns:1fr;gap:30px}
+  .row{grid-template-columns:1fr;gap:18px}
+  .R.stick{position:static}
+}
+@media(max-width:600px){ .bar-r .blk{display:none} }
+
+/* ---------- soft glow field (dedalus-style) ---------- */
+.bg-waves { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; background:#0A0A08; }
+.bg-waves .glow {
+  position:absolute; inset:-40%;
+  background:
+    radial-gradient(38% 42% at 26% 36%, rgba(216,245,0,0.55), transparent 62%),
+    radial-gradient(30% 38% at 66% 26%, rgba(234,255,51,0.42), transparent 60%),
+    radial-gradient(42% 46% at 74% 66%, rgba(168,191,0,0.48), transparent 62%),
+    radial-gradient(28% 32% at 40% 80%, rgba(216,245,0,0.38), transparent 60%);
+  filter: blur(70px) saturate(1.08);
+  animation: glowdrift 28s ease-in-out infinite alternate;
+}
+@keyframes glowdrift {
+  0%   { transform: translate(-3%,-2%) scale(1.05) rotate(0deg); }
+  50%  { transform: translate(3%,3%)   scale(1.14) rotate(2deg); }
+  100% { transform: translate(-2%,2%)  scale(1.06) rotate(-1deg); }
+}
+.bg-waves .grain {
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.6) 0.9px, transparent 1.5px);
+  background-size: 5px 5px;
+}
+.bg-waves::after {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(ellipse 82% 62% at 50% 42%, transparent 28%, rgba(10,10,8,0.55) 88%);
+}
+@media (prefers-reduced-motion: reduce){ .bg-waves .glow { animation:none; } }
+
+</style>
+</head>
+<body>
+<div class="bg-waves" aria-hidden="true"><div class="glow"></div><div class="grain"></div></div>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="mk" viewBox="0 0 1254 1254">
+    <path d="M370 340 L550 340 L550 430 C550 530 680 530 680 630 L680 865 L500 865 L500 630 C500 530 370 530 370 430 Z" fill="currentColor"/>
+    <path d="M690 340 L870 340 L870 590 C870 690 985 690 985 790 L985 865 L805 865 L805 790 C805 690 690 690 690 590 Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="xi" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/></symbol>
+</svg>
+
+<div class="bar">
+  <div class="bar-in">
+    <a href="/" class="lg"><svg style="color:var(--y)"><use href="#mk"/></svg>Hood<i>Synapse</i></a>
+    <div class="bar-r">
+      <span class="blk"><span class="pulse"></span>block <span id="hb">—</span></span>
+      <a href="/" class="hm">← Console</a>
+    </div>
+  </div>
+</div>
+
+<div class="rail">
+  <div class="rail-in">
+    <a href="#connect" class="on">Connect</a>
+    <a href="#envelope">Envelope</a>
+    <span class="sep"></span>
+    <a href="#api">HTTP API</a>
+    <a href="#index">The Index</a>
+    <a href="#chain">Chain state</a>
+    <a href="#blocks">Blocks</a>
+    <a href="#accounts">Accounts</a>
+    <a href="#txs">Transactions</a>
+    <a href="#events">Events</a>
+    <span class="sep"></span>
+    <a href="#orbit">Orbit internals</a>
+    <a href="#gaps">Known gaps</a>
+    <a href="#limits">Limits</a>
+  </div>
+</div>
+
+<div class="top">
+  <div class="top-in">
+    <div>
+      <h1>Robinhood Chain reference.</h1>
+      <p>
+        Every method below was executed against mainnet while this page was written — the responses are
+        captured output, not illustrations. Read the left column for what a call does, the right column for
+        what it returns.
+      </p>
+    </div>
+    <div class="meta">
+      <div><span>network</span><span>Robinhood Chain</span></div>
+      <div><span>chain id</span><span><b>4663</b></span></div>
+      <div><span>client</span><span>nitro/v3.11.3</span></div>
+      <div><span>gas</span><span>ETH</span></div>
+      <div><span>transport</span><span>HTTP · CORS open</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="doc">
+
+  <!-- ============ SETUP ============ -->
+  <div class="grp">
+    <div class="grp-h" id="connect"><span class="gn">A</span><h2>Connect</h2><span class="gd">wallet · sdk</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">Network parameters</div>
+        <p>Robinhood Chain is an <b>Arbitrum Orbit</b> L2 settling to Ethereum. It is EVM-equivalent, so existing tooling — ethers, viem, web3.py, Foundry — works unchanged.</p>
+        <div class="prm">
+          <div class="ph">MAINNET</div>
+          <div><span class="pk">chainId</span><span class="pv">4663 · 0x1237</span></div>
+          <div><span class="pk">rpc</span><span class="pv">rpc.mainnet.chain.robinhood.com</span></div>
+          <div><span class="pk">explorer</span><span class="pv">robinhoodchain.blockscout.com</span></div>
+        </div>
+        <div class="prm">
+          <div class="ph">TESTNET</div>
+          <div><span class="pk">chainId</span><span class="pv">46630 · 0xB626</span></div>
+          <div><span class="pk">rpc</span><span class="pv">rpc.testnet.chain.robinhood.com</span></div>
+          <div><span class="pk">faucet</span><span class="pv">faucet.testnet.chain.robinhood.com</span></div>
+        </div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">ADD TO WALLET<span class="lg2">javascript</span></div>
+<pre><code><span class="k">await</span> window.ethereum.request({
+  method: <span class="s">'wallet_addEthereumChain'</span>,
+  params: [{
+    chainId: <span class="s">'0x1237'</span>,
+    chainName: <span class="s">'Robinhood Chain'</span>,
+    nativeCurrency: {
+      name: <span class="s">'Ether'</span>, symbol: <span class="s">'ETH'</span>, decimals: <span class="n">18</span>
+    },
+    rpcUrls: [<span class="s">'https://rpc.mainnet.chain.robinhood.com'</span>],
+    blockExplorerUrls: [<span class="s">'https://robinhoodchain.blockscout.com'</span>]
+  }]
+});</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" id="envelope">
+      <div class="L">
+        <div class="sig plain">Request envelope</div>
+        <p>Every call is an HTTP <code>POST</code> with the same JSON body. Only <code>method</code> and <code>params</code> change between calls.</p>
+        <p>No API key, no account, no headers beyond content type.</p>
+        <div class="info"><b>Everything returns hex.</b> Heights, balances, gas and timestamps are hex strings. Decode with <code>parseInt(h,16)</code>, or <code>BigInt(h)</code> when the value can exceed 2⁵³.</div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">REQUEST<span class="lg2">curl</span></div>
+<pre><code>curl -X POST https://rpc.mainnet.chain.robinhood.com \
+  -H <span class="s">'Content-Type: application/json'</span> \
+  -d <span class="s">'{"jsonrpc":"2.0","method":"eth_blockNumber",
+       "params":[],"id":1}'</span></code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="s">"id"</span>: <span class="n">1</span>, <span class="s">"result"</span>: <span class="s">"0xdec54d"</span> }</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HTTP API ============ -->
+  <div class="grp">
+    <div class="grp-h" id="api"><span class="gn">B</span><h2>HTTP API</h2><span class="gd">hoodsynapse.xyz/api &#183; no key</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">GET /api/&#8230;</div>
+        <p>Hood Synapse ships its own HTTP API on top of the chain. Same live data as the console,
+        already cleaned up: <b>decimal numbers</b> instead of hex, <b>ISO timestamps</b>, and ArbOS
+        system transactions <b>identified and counted separately</b>.</p>
+        <p>Open CORS, plain GET requests &#8212; call it from a browser, a script, or straight from <code>curl</code>.</p>
+        <div class="prm">
+          <div class="ph">ENDPOINTS</div>
+          <div><span class="pk">/api</span><span class="pv">endpoint index</span></div>
+          <div><span class="pk">/api/stats</span><span class="pv">chain snapshot &#8212; block, gas, block time</span></div>
+          <div><span class="pk">/api/gas</span><span class="pv">gas breakdown</span></div>
+          <div><span class="pk">/api/block/latest</span><span class="pv">latest block, cleaned</span></div>
+          <div><span class="pk">/api/block/{n}</span><span class="pv">any block by decimal number</span></div>
+          <div><span class="pk">/api/history</span><span class="pv">historical blocks from our index</span></div>
+          <div><span class="pk">/api/daily</span><span class="pv">daily chain statistics</span></div>
+          <div><span class="pk">/api/index-status</span><span class="pv">how far the index reaches</span></div>
+        </div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">TRY IT<span class="lg2">curl</span></div>
+<pre><code>curl https://hoodsynapse.xyz/api/stats</code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"chainId"</span>: <span class="n">4663</span>,
+  <span class="s">"network"</span>: <span class="s">"mainnet"</span>,
+  <span class="s">"latestBlock"</span>: <span class="n">16339023</span>,
+  <span class="s">"blockTimestampISO"</span>: <span class="s">"2026-07-22T10:04:13.000Z"</span>,
+  <span class="s">"blockTimeSeconds"</span>: <span class="n">4.0</span>,
+  <span class="s">"gasPriceGwei"</span>: <span class="n">0.07317</span>,
+  <span class="s">"l1BlockNumber"</span>: <span class="n">25587556</span>,
+  <span class="s">"txCountLatestBlock"</span>: <span class="n">14</span>,
+  <span class="s">"provider"</span>: <span class="s">"Hood Synapse"</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">/api/block/latest</div>
+        <p>Blocks come back with the fields you actually reason about. <code>userTxCount</code> excludes
+        ArbOS bookkeeping transactions, so your metrics are not inflated. Orbit fields
+        (<code>l1BlockNumber</code>, <code>sendCount</code>, <code>sendRoot</code>) are included, already decoded.</p>
+        <p>Responses are edge-cached for a few seconds; historical blocks are cached long, since they never change.</p>
+        <div class="info"><b>No key, but be fair.</b> The API sits on public infrastructure. For sustained
+        heavy reads, run against the RPC directly or use a dedicated provider.</div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">FROM CODE<span class="lg2">javascript</span></div>
+<pre><code><span class="k">const</span> block = <span class="k">await</span> fetch(
+  <span class="s">'https://hoodsynapse.xyz/api/block/latest'</span>
+).then(r =&gt; r.json());
+
+block.number        <span class="c">// 16339023 &#8212; decimal, not hex</span>
+block.userTxCount   <span class="c">// system txs already filtered</span>
+block.timestampISO  <span class="c">// ready to display</span></code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">FROM PYTHON<span class="lg2">python</span></div>
+<pre><code><span class="k">import</span> requests
+b = requests.get(<span class="s">'https://hoodsynapse.xyz/api/block/latest'</span>).json()
+<span class="k">print</span>(b[<span class="s">'number'</span>], b[<span class="s">'userTxCount'</span>], <span class="s">'user txs'</span>)</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ THE INDEX ============ -->
+  <div class="grp">
+    <div class="grp-h" id="index"><span class="gn">C</span><h2>The Index</h2><span class="gd">history &#183; aggregates</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">Why an index exists</div>
+        <p>An RPC answers for the present. Ask it for last week and it has nothing to say.
+        Hood Synapse runs its own indexer over Robinhood Chain and keeps the result, so the
+        past stays queryable.</p>
+        <p>The chain produces roughly <b>10 blocks per second</b> (~864k per day) and the public RPC
+        rate-limits sustained bulk reads. Indexing every block is not workable at that rate, so the
+        indexer <b>samples every 100th block</b> and rolls those samples into daily aggregates.</p>
+        <div class="info"><b>What that means for you.</b> Daily statistics (transactions, gas, block
+        cadence) are accurate and representative. Per-block history is a sample, not a complete archive
+        &#8212; and <code>/api/index-status</code> tells you exactly what the index holds.</div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">DAILY STATISTICS<span class="lg2">curl</span></div>
+<pre><code>curl https://hoodsynapse.xyz/api/daily?days=30</code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"days"</span>: [{
+    <span class="s">"day"</span>: <span class="s">"2026-07-26"</span>,
+    <span class="s">"blocks"</span>: <span class="n">876</span>,          <span class="c">// samples that day</span>
+    <span class="s">"txs"</span>: <span class="n">12968</span>,
+    <span class="s">"userTxs"</span>: <span class="n">9204</span>,       <span class="c">// system txs excluded</span>
+    <span class="s">"avgBaseFeeGwei"</span>: <span class="n">0.0509</span>,
+    <span class="s">"avgBlockTimeSeconds"</span>: <span class="n">0.872</span>
+  }]
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">/api/history</div>
+        <p>Walk backwards through indexed blocks. Use <code>limit</code> to size the page and
+        <code>before</code> to paginate &#8212; each response returns <code>nextBefore</code> for the next call.</p>
+        <div class="prm">
+          <div class="ph">PARAMETERS</div>
+          <div><span class="pk">limit</span><span class="pv">1&#8211;200, default 25</span></div>
+          <div><span class="pk">before</span><span class="pv">block number to page back from</span></div>
+        </div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">PAGINATE<span class="lg2">javascript</span></div>
+<pre><code><span class="k">let</span> before = <span class="k">null</span>, all = [];
+<span class="k">for</span> (<span class="k">let</span> i = 0; i &lt; 5; i++) {
+  <span class="k">const</span> url = <span class="s">'https://hoodsynapse.xyz/api/history?limit=100'</span>
+            + (before ? <span class="s">'&amp;before='</span> + before : <span class="s">''</span>);
+  <span class="k">const</span> page = <span class="k">await</span> fetch(url).then(r =&gt; r.json());
+  all.push(...page.blocks);
+  before = page.nextBefore;
+  <span class="k">if</span> (!before) <span class="k">break</span>;
+}</code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">INDEX STATUS<span class="lg2">curl</span></div>
+<pre><code>curl https://hoodsynapse.xyz/api/index-status
+
+<span class="c">{ "chainTip": 20061553, "lastIndexed": 20061111,</span>
+<span class="c">  "behind": 442, "blocksStored": 876, ... }</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CHAIN STATE ============ -->
+  <div class="grp">
+    <div class="grp-h" id="chain"><span class="gn">D</span><h2>Chain state</h2><span class="gd">identity · gas</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_chainId<span class="tag">VERIFIED</span></div>
+        <p>Network identifier. Use it to refuse work when a wallet is pointed at the wrong chain.</p>
+        <div class="prm"><div class="ph">PARAMS</div><div><span class="pk">none</span><span class="pv">—</span></div></div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"result"</span>: <span class="s">"0x1237"</span> }   <span class="c">// 4663</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_gasPrice<span class="tag">VERIFIED</span></div>
+        <p>Current gas price in wei. On this chain it sits around <b>0.05 gwei</b> — roughly three orders of magnitude below Ethereum L1.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"result"</span>: <span class="s">"0x30e9f90"</span> }   <span class="c">// 0.0514 gwei</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_maxPriorityFeePerGas<span class="tag">VERIFIED</span></div>
+        <p>Returns <code>0x0</code>.</p>
+        <div class="info"><b>Tipping buys nothing here.</b> Ordering is decided by the sequencer, not by a fee auction. Set priority fee to zero and let the base fee carry the transaction.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"result"</span>: <span class="s">"0x0"</span> }</code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">web3_clientVersion<span class="tag">VERIFIED</span></div>
+        <p>Node build string. Confirms the chain runs Arbitrum <b>Nitro</b>, which is what makes the Orbit fields further down appear.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"result"</span>: <span class="s">"nitro/v3.11.3-rc.4-4bed0c5/linux-arm64/go1.25.12"</span> }</code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCKS ============ -->
+  <div class="grp">
+    <div class="grp-h" id="blocks"><span class="gn">E</span><h2>Blocks</h2><span class="gd">~4s cadence</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_getBlockByNumber<span class="tag">VERIFIED</span></div>
+        <p>Fetch a block by height, or by the tag <code>latest</code>.</p>
+        <div class="prm">
+          <div class="ph">PARAMS</div>
+          <div><span class="pk">block</span><span class="pv">hex height or <code>'latest'</code></span></div>
+          <div><span class="pk">full</span><span class="pv"><code>true</code> expands transactions into objects</span></div>
+        </div>
+        <p>Passing <code>false</code> returns hashes only and is much lighter — use it for polling.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE (trimmed)<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"number"</span>:        <span class="s">"0xdec54d"</span>,
+  <span class="s">"timestamp"</span>:     <span class="s">"0x6a5dec90"</span>,
+  <span class="s">"gasUsed"</span>:       <span class="s">"0x71d02"</span>,
+  <span class="s">"baseFeePerGas"</span>: <span class="s">"0x3165ff0"</span>,
+  <span class="s">"transactions"</span>:  [ <span class="c">/* 6 hashes */</span> ],
+  <span class="c">// orbit-only, see section E</span>
+  <span class="s">"l1BlockNumber"</span>: <span class="s">"0x1863755"</span>,
+  <span class="s">"sendRoot"</span>:      <span class="s">"0xf6c227e8…"</span>,
+  <span class="s">"sendCount"</span>:     <span class="s">"0x227"</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">Polling for new blocks</div>
+        <p>The public endpoint is HTTP only — <b>no WebSocket subscriptions</b>. New blocks are discovered by polling.</p>
+        <div class="info"><b>Poll at block time.</b> Blocks land every ~4s. Polling every second triples your request count and hands you the same block three times.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">POLLER<span class="lg2">javascript</span></div>
+<pre><code><span class="k">let</span> seen = <span class="n">0</span>;
+
+setInterval(<span class="k">async</span> () => {
+  <span class="k">const</span> b = <span class="k">await</span> call(<span class="s">'eth_getBlockByNumber'</span>, [<span class="s">'latest'</span>, <span class="k">false</span>]);
+  <span class="k">const</span> h = parseInt(b.number, <span class="n">16</span>);
+  <span class="k">if</span> (h === seen) <span class="k">return</span>;
+  seen = h;
+  console.log(h, b.transactions.length, <span class="s">'tx'</span>);
+}, <span class="n">4000</span>);</code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ACCOUNTS ============ -->
+  <div class="grp">
+    <div class="grp-h" id="accounts"><span class="gn">F</span><h2>Accounts</h2><span class="gd">balances · code</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_getBalance<span class="tag">VERIFIED</span></div>
+        <p>Balance in wei at a given block.</p>
+        <div class="prm">
+          <div class="ph">PARAMS</div>
+          <div><span class="pk">address</span><span class="pv">20-byte hex</span></div>
+          <div><span class="pk">block</span><span class="pv"><code>'latest'</code> or hex height</span></div>
+        </div>
+        <div class="warn"><b>Use BigInt.</b> Wei values overflow JavaScript's safe integer range. Convert with <code>BigInt(hex)</code> and only cast to Number after dividing by 1e18.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">CALL<span class="lg2">javascript</span></div>
+<pre><code><span class="k">const</span> wei = <span class="k">await</span> call(<span class="s">'eth_getBalance'</span>, [addr, <span class="s">'latest'</span>]);
+<span class="k">const</span> eth = Number(BigInt(wei)) / <span class="n">1e18</span>;
+<span class="c">// 0.000237</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_getCode</div>
+        <p>Returns deployed bytecode. An empty result (<code>0x</code>) means the address is a plain wallet, not a contract — the cheapest way to tell them apart.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{ <span class="s">"result"</span>: <span class="s">"0x"</span> }        <span class="c">// EOA, not a contract</span></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TX ============ -->
+  <div class="grp">
+    <div class="grp-h" id="txs"><span class="gn">G</span><h2>Transactions</h2><span class="gd">submitted vs executed</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_getTransactionByHash <span class="tag">VERIFIED</span></div>
+        <div class="sig">eth_getTransactionReceipt <span class="tag">VERIFIED</span></div>
+        <p>A transaction has two halves and you need both: what was <b>submitted</b> (the transaction) and what <b>happened</b> (the receipt).</p>
+        <div class="warn"><b>Mined is not successful.</b> A reverted transaction still occupies a block and still burns gas. Check <code>receipt.status === '0x1'</code> before treating anything as done.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">CAPTURED FROM MAINNET<span class="lg2">python</span></div>
+<pre><code>h  = <span class="s">'0xb951c0274bd58288b01dbf3a94965a7efdfed4c2…'</span>
+tx = call(<span class="s">'eth_getTransactionByHash'</span>, [h])
+rc = call(<span class="s">'eth_getTransactionReceipt'</span>, [h])
+
+<span class="c"># from   0x6d9da725…  →  to  0x24d7cd0d…</span>
+<span class="c"># status 0x1  (success)</span>
+<span class="c"># gas    189,966</span>
+<span class="c"># logs   5</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">System transactions</div>
+        <p>Most blocks open with an internal ArbOS transaction: sender equals recipient, value is zero, <code>gasUsed</code> is <code>0x0</code>.</p>
+        <p>It is chain bookkeeping, not user activity.</p>
+        <div class="warn"><b>Filter it out.</b> Counting raw <code>transactions.length</code> inflates every metric you publish by one per block.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">SYSTEM TX SHAPE<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"from"</span>:    <span class="s">"0x…000a4b05"</span>,
+  <span class="s">"to"</span>:      <span class="s">"0x…000a4b05"</span>,   <span class="c">// identical</span>
+  <span class="s">"value"</span>:   <span class="s">"0x0"</span>,
+  <span class="s">"gasUsed"</span>: <span class="s">"0x0"</span>
+}</code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ EVENTS ============ -->
+  <div class="grp">
+    <div class="grp-h" id="events"><span class="gn">H</span><h2>Events</h2><span class="gd">logs · filters</span></div>
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_getLogs</div>
+        <p>Historical events, filtered by address and topic.</p>
+        <p>Always bound the range. With ~4s blocks, <b>2,000 blocks ≈ two hours</b> of history — page through longer windows in chunks rather than widening one query until it times out.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">FILTER<span class="lg2">javascript</span></div>
+<pre><code><span class="k">const</span> latest = parseInt(<span class="k">await</span> call(<span class="s">'eth_blockNumber'</span>), <span class="n">16</span>);
+
+<span class="k">const</span> logs = <span class="k">await</span> call(<span class="s">'eth_getLogs'</span>, [{
+  fromBlock: <span class="s">'0x'</span> + (latest - <span class="n">2000</span>).toString(<span class="n">16</span>),
+  toBlock:   <span class="s">'latest'</span>,
+  address:   contract,
+  topics:    [transferTopic]
+}]);</code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ORBIT ============ -->
+  <div class="grp">
+    <div class="grp-h" id="orbit"><span class="gn">I</span><h2>Orbit internals</h2><span class="gd">not on ethereum</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">l1BlockNumber</div>
+        <p>The Ethereum L1 block this L2 block is anchored to. An L2 block is only as final as the L1 block behind it — read this when you need real finality, not just inclusion.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">FIELD<span class="lg2">json</span></div>
+<pre><code><span class="s">"l1BlockNumber"</span>: <span class="s">"0x1863755"</span>   <span class="c">// 25,573,205</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">sendRoot · sendCount</div>
+        <p>Messages travelling L2 → L1 (withdrawals, cross-chain calls) accumulate into a merkle tree. <code>sendRoot</code> is its current root; <code>sendCount</code> is the running total of queued messages.</p>
+        <p>Watch <code>sendCount</code> to detect outbound activity without parsing every transaction.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">FIELDS<span class="lg2">json</span></div>
+<pre><code><span class="s">"sendRoot"</span>:  <span class="s">"0xf6c227e8bd780bce1fd394c5bcd9513f…"</span>,
+<span class="s">"sendCount"</span>: <span class="s">"0x227"</span>                <span class="c">// 551</span></code></pre></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">The miner field is the sequencer</div>
+        <p>There is no mining and no validator here. The <code>miner</code> address is a readable marker — decode its tail as ASCII and it spells what it is.</p>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">DECODE<span class="lg2">javascript</span></div>
+<pre><code><span class="k">const</span> m = <span class="s">'0xa4b000000000000000000073657175656e636572'</span>;
+Buffer.from(m.slice(<span class="n">-18</span>), <span class="s">'hex'</span>).toString();
+<span class="c">// → "sequencer"</span></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAPS ============ -->
+  <div class="grp">
+    <div class="grp-h" id="gaps"><span class="gn">J</span><h2>Known gaps</h2><span class="gd">handle these</span></div>
+    <div class="row">
+      <div class="L">
+        <div class="sig">eth_syncing<span class="tag">UNAVAILABLE</span></div>
+        <p>Not exposed on the public endpoint. Clients that assume it exists will read <code>undefined</code> and carry on silently.</p>
+        <div class="warn"><b>Check for <code>error</code> first.</b> A JSON-RPC failure returns HTTP 200 with an error object — inspect it before touching <code>result</code>.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"error"</span>: {
+    <span class="s">"message"</span>: <span class="s">"the method eth_syncing does not exist/is not available"</span>
+  }
+}</code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LIMITS ============ -->
+  <div class="grp" style="border-bottom:none">
+    <div class="grp-h" id="limits"><span class="gn">K</span><h2>Limits</h2><span class="gd">going to production</span></div>
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">The public endpoint</div>
+        <p>Free, keyless, CORS-open — ideal for reading, prototyping and browser apps. It is <b>rate limited and not intended for production</b>.</p>
+        <p>Move to a dedicated provider once you need archive history, throughput, or an uptime guarantee: <b>Alchemy</b>, <b>QuickNode</b>, Blockdaemon, dRPC, Validation Cloud.</p>
+        <div class="warn"><b>Never sign in the browser.</b> Everything documented here is read-only. Private keys belong in a wallet the user controls or a backend you control — never in page code.</div>
+      </div>
+      <div class="R">
+        <div class="cw"><div class="ch">ENDPOINT PROPERTIES<span class="lg2">summary</span></div>
+<pre><code>auth          <span class="c">none — no key required</span>
+cors          <span class="s">access-control-allow-origin: *</span>
+transport     <span class="c">HTTP POST only — no websocket</span>
+rate limit    <span class="c">yes, unspecified — back off on failure</span>
+archive       <span class="c">not guaranteed</span></code></pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-in">
+    <div class="f-top">
+      <span class="lg"><svg style="color:var(--y)"><use href="#mk"/></svg>Hood<i>Synapse</i></span>
+      <span>© 2026 Hood Synapse. All rights reserved.</span>
+      <a class="f-x" href="https://x.com/hoodsynapse" target="_blank" rel="noopener"><svg><use href="#xi"/></svg>@hoodsynapse</a>
+    </div>
+    <p class="disc">
+      Hood Synapse is an independent project. Not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc.<br>
+      Values captured from the public RPC and subject to change — verify against the chain before relying on them.
+    </p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var RPC='https://rpc.mainnet.chain.robinhood.com';
+  function call(m,p){return fetch(RPC,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({jsonrpc:'2.0',method:m,params:p||[],id:1})}).then(function(r){return r.json();}).then(function(j){return j.result;});}
+  function tick(){ call('eth_blockNumber').then(function(h){
+    if(h) document.getElementById('hb').textContent=parseInt(h,16).toLocaleString('en-US');
+  }).catch(function(){}); }
+  tick(); setInterval(tick,5000);
+
+  var links=[].slice.call(document.querySelectorAll('.rail a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  function spy(){
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k]&&secs[k].getBoundingClientRect().top<160) i=k; }
+    links.forEach(function(a,n){ a.classList.toggle('on', n===i); });
+  }
+  spy(); window.addEventListener('scroll',spy,{passive:true});
+})();
+</script>
+</body>
+</html>
