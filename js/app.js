@@ -135,3 +135,77 @@
     if (box) box.innerHTML = '<div class="chart-empty">history unavailable</div>';
   });
 })();
+
+/* ---------- tokens: what's moving on the chain ---------- */
+(function(){
+  var list = document.getElementById('tok-list');
+  if (!list) return;
+  var fmt = function(n){ return Number(n).toLocaleString('en-US'); };
+
+  function render(kind){
+    list.innerHTML = '<div class="tok-empty">reading the index&#8230;</div>';
+    fetch('/api/tokens?limit=15' + (kind ? '&kind=' + kind : ''))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var counts = d.byKind || {};
+        var total = Object.keys(counts).reduce(function(s,k){ return s + counts[k]; }, 0);
+        var cEl = document.getElementById('tok-count');
+        if (cEl) cEl.textContent = fmt(total) + ' tokens indexed';
+
+        [].forEach.call(document.querySelectorAll('.tok-tab'), function(b){
+          var k = b.getAttribute('data-kind');
+          var n = k ? counts[k] : total;
+          if (n != null && !b.querySelector('b')) {
+            var s = document.createElement('b'); s.textContent = n; b.appendChild(s);
+          }
+        });
+
+        if (!d.tokens || !d.tokens.length) {
+          list.innerHTML = '<div class="tok-empty">nothing here yet</div>';
+          return;
+        }
+        list.innerHTML = '';
+        d.tokens.forEach(function(t, i){
+          var row = document.createElement('div');
+          row.className = 'tok-row';
+          row.innerHTML =
+            '<span class="n">' + (i + 1) + '</span>' +
+            '<span class="sym">' + (t.symbol || '&#8212;') + '</span>' +
+            '<span class="nm">' + (t.name || '&#8212;') + '</span>' +
+            '<span class="tok-kind ' + (t.kind || '') + '">' + (t.kind || '?') + '</span>' +
+            '<span class="tx">' + fmt(t.transfers) + ' <span>tx</span></span>';
+          list.appendChild(row);
+        });
+      })
+      .catch(function(){ list.innerHTML = '<div class="tok-empty">token index unavailable</div>'; });
+  }
+
+  [].forEach.call(document.querySelectorAll('.tok-tab'), function(b){
+    b.addEventListener('click', function(){
+      [].forEach.call(document.querySelectorAll('.tok-tab'), function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      render(b.getAttribute('data-kind'));
+    });
+  });
+
+  render('');
+})();
+
+/* ---------- pulse the live block number when it changes ---------- */
+(function(){
+  var watch = ['hd-block', 's-block', 'n-core-s'];
+  var last = {};
+  setInterval(function(){
+    watch.forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.textContent;
+      if (last[id] !== undefined && last[id] !== v) {
+        el.classList.remove('ticked');
+        void el.offsetWidth;          // restart the animation
+        el.classList.add('ticked');
+      }
+      last[id] = v;
+    });
+  }, 700);
+})();

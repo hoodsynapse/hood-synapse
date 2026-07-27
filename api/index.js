@@ -16,7 +16,8 @@ module.exports = async (req, res) => {
       'GET /api/block/{number}': 'block by number (decimal)',
       'GET /api/history': 'historical blocks from our own index (?limit, ?before)',
       'GET /api/daily': 'daily chain statistics (?days)',
-      'GET /api/index-status': 'how far the Hood Synapse index reaches'
+      'GET /api/index-status': 'how far the Hood Synapse index reaches',
+      'GET /api/tokens': 'tokens ranked by activity (?limit, ?kind=equity|fund|private|stable|native)'
     },
     index: {
       note: 'Hood Synapse runs its own indexer over Robinhood Chain. The chain produces ~10 blocks/second, so the index samples every 100th block and rolls them into daily aggregates.',

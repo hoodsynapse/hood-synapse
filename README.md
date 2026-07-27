@@ -5,7 +5,8 @@
 <h1 align="center">Hood Synapse</h1>
 
 <p align="center">
-  Live data, an indexer, an API and a CLI for <b>Robinhood Chain</b>.<br>
+  Live data, an indexer, an API, a CLI and an MCP server for <b>Robinhood Chain</b>.<br>
+  Tokenized equities, RWAs and memecoins — readable by people and agents alike.<br>
   No key. No account. No middleman.
 </p>
 
@@ -62,6 +63,7 @@ Base: `https://hoodsynapse.xyz/api`
 | `GET /api/history` | historical blocks from our index |
 | `GET /api/daily` | daily chain statistics |
 | `GET /api/index-status` | how far the index reaches |
+| `GET /api/tokens` | tokens by activity (`?kind=rwa\|equity\|fund\|private\|stable\|native`) |
 
 ```bash
 curl https://hoodsynapse.xyz/api/daily?days=30
@@ -82,9 +84,10 @@ Add `--json` to any command to pipe into `jq`.
 
 ## Clients
 
-| Language | Use it |
+| Client | Use it |
 | --- | --- |
-| **CLI** | `npx hoodsynapse stats` — [npm](https://www.npmjs.com/package/hoodsynapse) |
+| **CLI** | `npx hoodsynapse stats` — [npm](https://www.npmjs.com/package/hoodsynapse) · [source](clients/cli) |
+| **MCP** (AI agents) | `npx hoodsynapse-mcp` — [npm](https://www.npmjs.com/package/hoodsynapse-mcp) · [source](clients/mcp) |
 | **Python** | [`clients/python`](clients/python) — standard library only, no dependencies |
 | **Anything else** | Plain HTTP + JSON. `curl`, `fetch`, `requests` — it all works. |
 
@@ -93,6 +96,42 @@ from hoodsynapse import HoodSynapse
 
 hs = HoodSynapse()
 print(hs.stats()["latestBlock"])
+```
+
+## For AI agents
+
+Hood Synapse ships an MCP server, so any agent that speaks the Model Context Protocol can
+read the chain directly:
+
+```json
+{
+  "mcpServers": {
+    "hoodsynapse": {
+      "command": "npx",
+      "args": ["-y", "hoodsynapse-mcp"]
+    }
+  }
+}
+```
+
+Tools exposed: `get_chain_stats`, `list_tokens`, `get_block`, `get_daily_activity`,
+`get_index_status`, `get_gas`. An agent can then answer things like *"what real-world
+assets trade on Robinhood Chain?"* — and check its own coverage before it answers.
+
+## What's on this chain
+
+Robinhood Chain carries tokenized real-world assets alongside native tokens:
+
+| | Examples |
+| --- | --- |
+| **Equities** | NVIDIA, Tesla, Apple, Amazon, Alphabet, GameStop, Meta, Strategy |
+| **Funds** | SPDR S&P 500, Invesco QQQ, iShares Silver |
+| **Private** | SpaceX |
+| **Stablecoins** | Global Dollar (USDG) |
+| **Native** | memecoins and chain-native tokens |
+
+```bash
+curl https://hoodsynapse.xyz/api/tokens?kind=rwa
 ```
 
 ## How the index works
@@ -122,6 +161,8 @@ api/                serverless functions (the HTTP API + indexer)
   _lib.js           RPC helpers, response shaping
   _db.js            database pool
   cron/             the indexer
+clients/cli/        the npx CLI
+clients/mcp/        MCP server for AI agents
 clients/python/     Python client, standard library only
 css/                stylesheets
 js/                 browser scripts

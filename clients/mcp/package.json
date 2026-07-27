@@ -1,0 +1,39 @@
+{
+  "name": "hoodsynapse-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Robinhood Chain — gives AI agents live blocks, tokenized equities, RWAs and chain history through Hood Synapse.",
+  "bin": {
+    "hoodsynapse-mcp": "bin/server.js"
+  },
+  "main": "bin/server.js",
+  "type": "module",
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "robinhood-chain",
+    "rwa",
+    "blockchain",
+    "onchain-data",
+    "hood-synapse",
+    "claude",
+    "agentic"
+  ],
+  "homepage": "https://hoodsynapse.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodsynapse/hood-synapse"
+  },
+  "license": "MIT",
+  "author": "Hood Synapse",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

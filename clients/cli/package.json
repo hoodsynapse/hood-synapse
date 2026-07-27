@@ -1,0 +1,34 @@
+{
+  "name": "hoodsynapse",
+  "version": "1.0.0",
+  "description": "Command-line access to Robinhood Chain — live data, history, and daily statistics from the Hood Synapse index.",
+  "bin": {
+    "hoodsynapse": "bin/cli.js"
+  },
+  "main": "bin/cli.js",
+  "type": "commonjs",
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "robinhood-chain",
+    "blockchain",
+    "cli",
+    "evm",
+    "arbitrum-orbit",
+    "rpc",
+    "indexer",
+    "hood-synapse"
+  ],
+  "homepage": "https://hoodsynapse.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodsynapse/hood-synapse"
+  },
+  "license": "MIT",
+  "author": "Hood Synapse"
+}

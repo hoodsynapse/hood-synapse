@@ -41,6 +41,8 @@
     <nav>
       <a href="#live">Live data</a>
       <a href="#index">Index</a>
+      <a href="#tokens">Tokens</a>
+      <a href="#agents">Agents</a>
       <a href="#api">API</a>
       <a href="#network">Network</a>
       <a href="/docs">Docs</a>
@@ -58,7 +60,13 @@
       <h1>Where chain data<br><em>speaks for itself.</em></h1>
       <p class="lead">Read the chain live. Verify every number.
         All from one console — <b>no key, no account, no middleman</b>.</p>
-      <div class="hero-cta"><a href="#live" class="btn-pill">Open the console</a></div>
+      <div class="hero-cta">
+        <a href="#live" class="btn-pill">Open the console</a>
+        <a href="https://github.com/hoodsynapse/hood-synapse" target="_blank" rel="noopener" class="btn-gh">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.93.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.21.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>
+          GitHub
+        </a>
+      </div>
     </div>
 
     <div class="map" id="map">
@@ -137,9 +145,82 @@
   </div>
 </section>
 
+<section id="tokens">
+  <div class="wrap">
+    <div class="sec-num">C &#8212; WHAT'S MOVING</div>
+    <h2>Real-world assets<br>and memecoins, same chain.</h2>
+    <p class="sec-desc">
+      Two things share this chain: <b>real-world assets</b> and <b>memecoins</b>. NVIDIA, Tesla,
+      SpaceX and the S&amp;P 500 move here as tokens, right next to Dog In Hood and Roaring Cat.
+      This is what the index sees moving, ranked by transfer activity.
+    </p>
+
+    <div class="tok-tabs" id="tok-tabs">
+      <button class="tok-tab on" data-kind="">All</button>
+      <button class="tok-tab" data-kind="rwa">RWA</button>
+      <button class="tok-tab" data-kind="equity">Equities</button>
+      <button class="tok-tab" data-kind="fund">Funds</button>
+      <button class="tok-tab" data-kind="private">Private</button>
+      <button class="tok-tab" data-kind="stable">Stablecoins</button>
+      <button class="tok-tab" data-kind="native">Native</button>
+    </div>
+
+    <div class="tok-box">
+      <div class="tok-head"><span class="dot"></span> Tokens by activity <span class="r" id="tok-count">loading&#8230;</span></div>
+      <div id="tok-list"><div class="tok-empty">reading the index&#8230;</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="agents">
+  <div class="wrap">
+    <div class="sec-num">D &#8212; FOR AGENTS</div>
+    <h2>Chain data your agents<br>can actually read.</h2>
+    <p class="sec-desc">
+      Hood Synapse ships an <b>MCP server</b>, so any agent that speaks the Model Context Protocol
+      can query Robinhood Chain directly &#8212; live blocks, tokenized equities, RWAs and history.
+      One line of config, no key, no account.
+    </p>
+
+    <div class="agent-grid">
+      <div>
+        <div class="code" style="margin-bottom:16px">
+          <div class="code-h">add to your agent <span class="lang">json</span></div>
+<pre><code>{
+  <span class="tk-s">"mcpServers"</span>: {
+    <span class="tk-s">"hoodsynapse"</span>: {
+      <span class="tk-s">"command"</span>: <span class="tk-s">"npx"</span>,
+      <span class="tk-s">"args"</span>: [<span class="tk-s">"-y"</span>, <span class="tk-s">"hoodsynapse-mcp"</span>]
+    }
+  }
+}</code></pre>
+        </div>
+
+        <div style="font-size:11.5px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;margin:22px 0 12px">
+          What it can answer
+        </div>
+        <div class="agent-ask"><q>What real-world assets trade on Robinhood Chain?</q></div>
+        <div class="agent-ask"><q>How busy is the chain today versus last week?</q></div>
+        <div class="agent-ask"><q>What happened in block 20,401,056?</q></div>
+        <div class="agent-ask" style="margin-bottom:0"><q>Is the index current enough to trust that?</q></div>
+      </div>
+
+      <div class="agent-tools">
+        <div class="h"><span class="dot"></span> Tools exposed to the agent</div>
+        <div class="agent-tool"><span class="t">get_chain_stats</span><span class="d">Latest block, block time, gas, L1 anchor</span></div>
+        <div class="agent-tool"><span class="t">list_tokens</span><span class="d">Tokens by activity &#8212; filter rwa, equity, fund, private, stable, native</span></div>
+        <div class="agent-tool"><span class="t">get_block</span><span class="d">One block, Orbit fields decoded, system txs separated</span></div>
+        <div class="agent-tool"><span class="t">get_daily_activity</span><span class="d">Daily transactions and block cadence over time</span></div>
+        <div class="agent-tool"><span class="t">get_index_status</span><span class="d">What the index holds, and how current it is</span></div>
+        <div class="agent-tool"><span class="t">get_gas</span><span class="d">Gas price, base fee, and why priority fees are zero here</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="api">
   <div class="wrap">
-    <div class="sec-num">C — QUERY IT</div>
+    <div class="sec-num">E — QUERY IT</div>
     <h2>No key. Just read it.</h2>
     <p class="sec-desc">
       Hood Synapse ships its own HTTP API on top of the chain &#8212; clean JSON, decimal numbers,
@@ -201,7 +282,7 @@ GET /api/block/{number}   <span class="tk-c">&#8594; any block by number</span>
 
 <section id="network">
   <div class="wrap">
-    <div class="sec-num">D — CONNECT</div>
+    <div class="sec-num">F — CONNECT</div>
     <h2>Connect to Robinhood Chain.</h2>
     <p class="sec-desc">Add the network to any EVM wallet or SDK. These are the official public parameters.</p>
 
