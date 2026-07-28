@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1180">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="virtual-protocol-site-verification" content="8df04a5b834ed065c4e9398f53bbe7fe" />
 <title>Reference — Hood Synapse</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -13,14 +13,14 @@
 <meta property="og:url" content="https://hoodsynapse.xyz/docs">
 <meta property="og:title" content="Reference - Hood Synapse">
 <meta property="og:description" content="Developer reference for Robinhood Chain: RPC methods, Arbitrum Orbit internals, and runnable recipes.">
-<meta property="og:image" content="https://hoodsynapse.xyz/assets/og.jpg">
+<meta property="og:image" content="https://hoodsynapse.xyz/assets/og-2.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@hoodsynapse">
+<meta name="twitter:site" content="@hoodsynapse_">
 <meta name="twitter:title" content="Reference - Hood Synapse">
 <meta name="twitter:description" content="Developer reference for Robinhood Chain: RPC methods, Arbitrum Orbit internals, and runnable recipes.">
-<meta name="twitter:image" content="https://hoodsynapse.xyz/assets/og.jpg">
+<meta name="twitter:image" content="https://hoodsynapse.xyz/assets/og-2.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -41,6 +41,7 @@
     <a href="/" class="lg"><svg style="color:var(--y)"><use href="#mk"/></svg>Hood<i>Synapse</i></a>
     <div class="bar-r">
       <span class="blk"><span class="pulse"></span>block <span id="hb">—</span></span>
+      <a href="/token" class="hm">$SYNAPSE</a>
       <a href="/" class="hm">← Console</a>
     </div>
   </div>
@@ -53,6 +54,8 @@
     <span class="sep"></span>
     <a href="#api">HTTP API</a>
     <a href="#index">The Index</a>
+    <a href="#tokens">Tokens &amp; RWAs</a>
+    <a href="#agents">AI agents</a>
     <a href="#chain">Chain state</a>
     <a href="#blocks">Blocks</a>
     <a href="#accounts">Accounts</a>
@@ -171,6 +174,7 @@
           <div><span class="pk">/api/history</span><span class="pv">historical blocks from our index</span></div>
           <div><span class="pk">/api/daily</span><span class="pv">daily chain statistics</span></div>
           <div><span class="pk">/api/index-status</span><span class="pv">how far the index reaches</span></div>
+          <div><span class="pk">/api/tokens</span><span class="pv">tokens by activity, filterable by kind</span></div>
         </div>
       </div>
       <div class="R">
@@ -299,9 +303,161 @@ b = requests.get(<span class="s">'https://hoodsynapse.xyz/api/block/latest'</spa
     </div>
   </div>
 
+  <!-- ============ TOKENS & RWAs ============ -->
+  <div class="grp">
+    <div class="grp-h" id="tokens"><span class="gn">D</span><h2>Tokens &amp; RWAs</h2><span class="gd">equities &#183; funds &#183; memecoins</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">GET /api/tokens</div>
+        <p>Robinhood Chain carries tokenized real-world assets next to native tokens. NVIDIA,
+        Tesla, Apple, GameStop, SpaceX, the S&amp;P 500 and iShares Silver all move here as
+        ERC-20s, alongside stablecoins and memecoins.</p>
+        <p>The scanner reads <code>Transfer</code> logs continuously and ranks tokens by activity.
+        Classification comes from Robinhood's own on-chain naming &#8212; tokenized assets carry a
+        <code>&#8226; Robinhood Token</code> marker in the token name.</p>
+        <p>A second pass records the market: <code>priceUsd</code>, <code>priceChange24h</code>,
+        <code>liquidityUsd</code> and <code>volume24h</code>, read from DEX pairs on this chain,
+        plus <code>holders</code> from the chain explorer. The busiest tokens are refreshed every
+        minute; the long tail is filled in over time. <code>marketAt</code> says when a row was
+        last priced.</p>
+        <div class="prm">
+          <div class="ph">PRICE HISTORY</div>
+          <div><span class="pk">history</span><span class="pv">contract address &#8212; returns a daily series instead of the list</span></div>
+          <div><span class="pk">days</span><span class="pv">1&#8211;365, default 90</span></div>
+        </div>
+        <p>Each day carries <code>open</code>, <code>high</code>, <code>low</code>,
+        <code>close</code>, <code>liquidityUsd</code>, <code>volume24h</code> and
+        <code>samples</code> &#8212; how many readings that day was built from.</p>
+        <div class="prm">
+          <div class="ph">PARAMETERS</div>
+          <div><span class="pk">kind</span><span class="pv">rwa &#183; equity &#183; fund &#183; private &#183; stable &#183; meme &#183; infra</span></div>
+          <div><span class="pk">limit</span><span class="pv">1&#8211;200, default 25</span></div>
+        </div>
+        <div class="info"><b>rwa</b> is an umbrella: equities, funds and private companies in one
+        call. Everything else is a direct category match.</div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">REAL-WORLD ASSETS<span class="lg2">curl</span></div>
+<pre><code>curl https://hoodsynapse.xyz/api/tokens?kind=rwa</code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">RESPONSE<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"byKind"</span>: { <span class="s">"equity"</span>: <span class="n">31</span>, <span class="s">"fund"</span>: <span class="n">4</span>, <span class="s">"private"</span>: <span class="n">4</span>,
+              <span class="s">"stable"</span>: <span class="n">9</span>, <span class="s">"meme"</span>: <span class="n">1416</span>, <span class="s">"rwa"</span>: <span class="n">39</span> },
+  <span class="s">"tokens"</span>: [{
+    <span class="s">"symbol"</span>: <span class="s">"NVDA"</span>,
+    <span class="s">"name"</span>: <span class="s">"NVIDIA &#8226; Robinhood Token"</span>,
+    <span class="s">"kind"</span>: <span class="s">"equity"</span>,
+    <span class="s">"decimals"</span>: <span class="n">18</span>,
+    <span class="s">"transfers"</span>: <span class="n">1555</span>,
+    <span class="s">"priceUsd"</span>: <span class="n">194.78</span>,
+    <span class="s">"priceChange24h"</span>: <span class="n">-6.8</span>,
+    <span class="s">"liquidityUsd"</span>: <span class="n">3686492</span>,
+    <span class="s">"volume24h"</span>: <span class="n">13252843</span>,
+    <span class="s">"holders"</span>: <span class="n">30587</span>,
+    <span class="s">"iconUrl"</span>: <span class="s">"/assets/tokens/NVDA.png"</span>,
+    <span class="s">"address"</span>: <span class="s">"0x&#8230;"</span>
+  }]
+}</code></pre>
+        </div>
+        <div class="warn"><b>Transfer counts are relative.</b> They accumulate from when the
+        scanner first saw a token, not from genesis. Use them to compare activity, not as a
+        lifetime total.</div>
+        <div class="cw">
+          <div class="ch">DAILY HISTORY<span class="lg2">curl</span></div>
+<pre><code>curl <span class="s">"https://hoodsynapse.xyz/api/tokens?history=0xd060&#8230;&amp;days=30"</span></code></pre>
+        </div>
+        <div class="info"><b>History has no backfill.</b> A token's series starts the day Hood
+        Synapse first priced it. The prices before that were never recorded anywhere readable,
+        so they are absent rather than estimated.</div>
+        <div class="warn"><b>Price is the on-chain DEX price.</b> It comes from the deepest pair
+        on Robinhood Chain, not from a reference exchange. A tokenized equity trading against a
+        few thousand dollars of depth can sit well away from its off-chain price, so read
+        <code>liquidityUsd</code> next to it. Tokens with no pair return <code>null</code> rather
+        than a guess.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ AI AGENTS ============ -->
+  <div class="grp">
+    <div class="grp-h" id="agents"><span class="gn">E</span><h2>AI agents</h2><span class="gd">mcp &#183; one line of config</span></div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig plain">Model Context Protocol</div>
+        <p>Hood Synapse ships an MCP server, so any agent that speaks the protocol can read
+        Robinhood Chain directly &#8212; no wrapper code, no API key, no account.</p>
+        <p>Point your client at <code>hoodsynapse-mcp</code> and the tools appear. Works with
+        Claude Desktop, agent frameworks, and anything else that implements MCP.</p>
+        <div class="prm">
+          <div class="ph">CONFIG LOCATION</div>
+          <div><span class="pk">macOS</span><span class="pv">~/Library/Application Support/Claude/claude_desktop_config.json</span></div>
+          <div><span class="pk">Windows</span><span class="pv">%APPDATA%\Claude\claude_desktop_config.json</span></div>
+        </div>
+        <div class="info"><b>Agents can check their own coverage.</b> <code>get_index_status</code>
+        reports what the index holds, so an agent can tell &#8220;no activity&#8221; apart from
+        &#8220;not indexed yet&#8221; before it answers.</div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">ADD THE SERVER<span class="lg2">json</span></div>
+<pre><code>{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"hoodsynapse"</span>: {
+      <span class="s">"command"</span>: <span class="s">"npx"</span>,
+      <span class="s">"args"</span>: [<span class="s">"-y"</span>, <span class="s">"hoodsynapse-mcp"</span>]
+    }
+  }
+}</code></pre>
+        </div>
+        <div class="cw">
+          <div class="ch">POINT IT ELSEWHERE<span class="lg2">env</span></div>
+<pre><code>HOODSYNAPSE_API=http://localhost:3000/api</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="L">
+        <div class="sig">Tools</div>
+        <p>Six read-only tools. Nothing signs, nothing spends &#8212; an agent using this can only
+        look.</p>
+        <div class="prm">
+          <div class="ph">EXPOSED TO THE AGENT</div>
+          <div><span class="pk">get_chain_stats</span><span class="pv">latest block, block time, gas, L1 anchor</span></div>
+          <div><span class="pk">list_tokens</span><span class="pv">tokens by activity, filterable by kind</span></div>
+          <div><span class="pk">get_block</span><span class="pv">one block, Orbit fields decoded</span></div>
+          <div><span class="pk">get_daily_activity</span><span class="pv">daily transactions and cadence</span></div>
+          <div><span class="pk">get_index_status</span><span class="pv">index coverage</span></div>
+          <div><span class="pk">get_gas</span><span class="pv">gas price and base fee</span></div>
+        </div>
+      </div>
+      <div class="R">
+        <div class="cw">
+          <div class="ch">WHAT AN AGENT CAN ANSWER<span class="lg2">example</span></div>
+<pre><code><span class="c">&#8220;What real-world assets trade on Robinhood Chain?&#8221;</span>
+
+<span class="c">&#8594; list_tokens({ kind: "rwa" })</span>
+
+RWA tokens on Robinhood Chain, by activity
+
+ 1. NVDA    equity   1,555 transfers  NVIDIA &#8226; Robinhood Token
+ 2. GME     equity   1,484 transfers  GameStop &#8226; Robinhood Token
+ 3. GOOGL   equity     752 transfers  Alphabet Class A &#8226; Robinhood Token
+ 4. SPCX    private    749 transfers  Space Exploration Technologies
+ 5. SLV     fund       560 transfers  iShares Silver Trust</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ CHAIN STATE ============ -->
   <div class="grp">
-    <div class="grp-h" id="chain"><span class="gn">D</span><h2>Chain state</h2><span class="gd">identity · gas</span></div>
+    <div class="grp-h" id="chain"><span class="gn">F</span><h2>Chain state</h2><span class="gd">identity · gas</span></div>
 
     <div class="row">
       <div class="L">
@@ -352,7 +508,7 @@ b = requests.get(<span class="s">'https://hoodsynapse.xyz/api/block/latest'</spa
 
   <!-- ============ BLOCKS ============ -->
   <div class="grp">
-    <div class="grp-h" id="blocks"><span class="gn">E</span><h2>Blocks</h2><span class="gd">~4s cadence</span></div>
+    <div class="grp-h" id="blocks"><span class="gn">G</span><h2>Blocks</h2><span class="gd">~4s cadence</span></div>
 
     <div class="row">
       <div class="L">
@@ -404,7 +560,7 @@ setInterval(<span class="k">async</span> () => {
 
   <!-- ============ ACCOUNTS ============ -->
   <div class="grp">
-    <div class="grp-h" id="accounts"><span class="gn">F</span><h2>Accounts</h2><span class="gd">balances · code</span></div>
+    <div class="grp-h" id="accounts"><span class="gn">H</span><h2>Accounts</h2><span class="gd">balances · code</span></div>
 
     <div class="row">
       <div class="L">
@@ -439,7 +595,7 @@ setInterval(<span class="k">async</span> () => {
 
   <!-- ============ TX ============ -->
   <div class="grp">
-    <div class="grp-h" id="txs"><span class="gn">G</span><h2>Transactions</h2><span class="gd">submitted vs executed</span></div>
+    <div class="grp-h" id="txs"><span class="gn">I</span><h2>Transactions</h2><span class="gd">submitted vs executed</span></div>
 
     <div class="row">
       <div class="L">
@@ -482,7 +638,7 @@ rc = call(<span class="s">'eth_getTransactionReceipt'</span>, [h])
 
   <!-- ============ EVENTS ============ -->
   <div class="grp">
-    <div class="grp-h" id="events"><span class="gn">H</span><h2>Events</h2><span class="gd">logs · filters</span></div>
+    <div class="grp-h" id="events"><span class="gn">J</span><h2>Events</h2><span class="gd">logs · filters</span></div>
     <div class="row">
       <div class="L">
         <div class="sig">eth_getLogs</div>
@@ -505,7 +661,7 @@ rc = call(<span class="s">'eth_getTransactionReceipt'</span>, [h])
 
   <!-- ============ ORBIT ============ -->
   <div class="grp">
-    <div class="grp-h" id="orbit"><span class="gn">I</span><h2>Orbit internals</h2><span class="gd">not on ethereum</span></div>
+    <div class="grp-h" id="orbit"><span class="gn">K</span><h2>Orbit internals</h2><span class="gd">not on ethereum</span></div>
 
     <div class="row">
       <div class="L">
@@ -547,7 +703,7 @@ Buffer.from(m.slice(<span class="n">-18</span>), <span class="s">'hex'</span>).t
 
   <!-- ============ GAPS ============ -->
   <div class="grp">
-    <div class="grp-h" id="gaps"><span class="gn">J</span><h2>Known gaps</h2><span class="gd">handle these</span></div>
+    <div class="grp-h" id="gaps"><span class="gn">L</span><h2>Known gaps</h2><span class="gd">handle these</span></div>
     <div class="row">
       <div class="L">
         <div class="sig">eth_syncing<span class="tag">UNAVAILABLE</span></div>
@@ -567,7 +723,7 @@ Buffer.from(m.slice(<span class="n">-18</span>), <span class="s">'hex'</span>).t
 
   <!-- ============ LIMITS ============ -->
   <div class="grp" style="border-bottom:none">
-    <div class="grp-h" id="limits"><span class="gn">K</span><h2>Limits</h2><span class="gd">going to production</span></div>
+    <div class="grp-h" id="limits"><span class="gn">M</span><h2>Limits</h2><span class="gd">going to production</span></div>
     <div class="row">
       <div class="L">
         <div class="sig plain">The public endpoint</div>
@@ -592,10 +748,9 @@ archive       <span class="c">not guaranteed</span></code></pre></div>
     <div class="f-top">
       <span class="lg"><svg style="color:var(--y)"><use href="#mk"/></svg>Hood<i>Synapse</i></span>
       <span>© 2026 Hood Synapse. All rights reserved.</span>
-      <a class="f-x" href="https://x.com/hoodsynapse" target="_blank" rel="noopener"><svg><use href="#xi"/></svg>@hoodsynapse</a>
+      <a class="f-x" href="https://x.com/hoodsynapse_" target="_blank" rel="noopener"><svg><use href="#xi"/></svg>@hoodsynapse_</a>
     </div>
     <p class="disc">
-      Hood Synapse is an independent project. Not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc.<br>
       Values captured from the public RPC and subject to change — verify against the chain before relying on them.
     </p>
   </div>

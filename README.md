@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="assets/og.jpg" alt="Hood Synapse" width="100%">
+  <img src="assets/og-2.jpg" alt="Hood Synapse" width="100%">
 </p>
 
 <h1 align="center">Hood Synapse</h1>
 
 <p align="center">
-  Live data, an indexer, an API, a CLI and an MCP server for <b>Robinhood Chain</b>.<br>
-  Tokenized equities, RWAs and memecoins — readable by people and agents alike.<br>
-  No key. No account. No middleman.
+  The data layer for <b>Robinhood Chain</b>.<br>
+  RWAs, stablecoins, memecoins — live, indexed, agent-readable.<br>
+  No key. No account.
 </p>
 
 <p align="center">
@@ -63,7 +63,8 @@ Base: `https://hoodsynapse.xyz/api`
 | `GET /api/history` | historical blocks from our index |
 | `GET /api/daily` | daily chain statistics |
 | `GET /api/index-status` | how far the index reaches |
-| `GET /api/tokens` | tokens by activity (`?kind=rwa\|equity\|fund\|private\|stable\|native`) |
+| `GET /api/tokens` | tokens by activity, with price, liquidity, volume and holders (`?kind=rwa\|equity\|fund\|private\|stable\|meme\|infra`) |
+| `GET /api/tokens?history={address}` | one token's daily open/high/low/close series |
 
 ```bash
 curl https://hoodsynapse.xyz/api/daily?days=30
@@ -76,6 +77,7 @@ npx hoodsynapse stats            # chain snapshot
 npx hoodsynapse gas              # gas breakdown
 npx hoodsynapse block 20061111   # one block, orbit fields decoded
 npx hoodsynapse blocks           # recent indexed blocks
+npx hoodsynapse tokens rwa       # tokenized equities, priced
 npx hoodsynapse daily            # activity chart in your terminal
 npx hoodsynapse status           # what the index holds
 ```
@@ -128,7 +130,8 @@ Robinhood Chain carries tokenized real-world assets alongside native tokens:
 | **Funds** | SPDR S&P 500, Invesco QQQ, iShares Silver |
 | **Private** | SpaceX |
 | **Stablecoins** | Global Dollar (USDG) |
-| **Native** | memecoins and chain-native tokens |
+| **Memecoins** | the long tail of chain-native tokens |
+| **Infrastructure** | WETH and platform tokens |
 
 ```bash
 curl https://hoodsynapse.xyz/api/tokens?kind=rwa
@@ -143,6 +146,15 @@ the indexer **samples every 100th block** and rolls those samples into daily agg
 That means daily statistics are accurate and representative, while per-block history is a
 sample rather than a complete archive. `GET /api/index-status` always reports exactly what
 the index holds — check it against the chain any time.
+
+## $SYNAPSE
+
+Reading Robinhood Chain stays free — the API, the CLI and the MCP server need no key and no
+account, and that does not change. **$SYNAPSE** is planned for what sits above that line:
+heavier usage, index priority, and settlement between agents.
+
+It has not launched. There is no contract address, no price, and no sale.
+[hoodsynapse.xyz/token](https://hoodsynapse.xyz/token) has the details.
 
 ## Network
 
@@ -170,6 +182,7 @@ db/schema.sql       tables and the daily rollup
 assets/             brand assets
 index.html          landing page
 docs.html           developer reference
+token.html          $SYNAPSE
 ```
 
 ## Running it yourself
@@ -180,12 +193,15 @@ The API needs one environment variable:
 DATABASE_URL=postgresql://...
 ```
 
-Apply `db/schema.sql` to that database, then deploy. The indexer is a plain HTTP endpoint
-(`/api/cron`) — hit it on a schedule and it walks the chain forward.
+Apply `db/schema.sql` and `db/tokens.sql`, then deploy. The three workers are plain HTTP
+endpoints — hit them on a schedule and they walk forward on their own:
+
+| Endpoint | Does |
+| --- | --- |
+| `/api/cron` | samples blocks into the index |
+| `/api/cron/tokens` | reads `Transfer` logs, classifies tokens, finds logos |
+| `/api/cron/market` | records price, liquidity, volume and holders, and writes the daily history row |
 
 ---
-
-Hood Synapse is an independent project. Not affiliated with, endorsed by, or sponsored by
-Robinhood Markets, Inc.
 
 MIT

@@ -1,7 +1,7 @@
 {
   "name": "hoodsynapse",
-  "version": "1.0.0",
-  "description": "Command-line access to Robinhood Chain — live data, history, and daily statistics from the Hood Synapse index.",
+  "version": "1.1.0",
+  "description": "Command-line access to Robinhood Chain — tokenized equities, stablecoins and memecoins with price and liquidity, plus history from the Hood Synapse index.",
   "bin": {
     "hoodsynapse": "bin/cli.js"
   },
@@ -22,7 +22,10 @@
     "arbitrum-orbit",
     "rpc",
     "indexer",
-    "hood-synapse"
+    "hood-synapse",
+    "rwa",
+    "tokenized-stocks",
+    "defi"
   ],
   "homepage": "https://hoodsynapse.xyz",
   "repository": {

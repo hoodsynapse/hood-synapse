@@ -92,7 +92,4 @@ Requires Node 18+.
 
 ---
 
-Hood Synapse is an independent project. Not affiliated with, endorsed by, or sponsored by
-Robinhood Markets, Inc.
-
 MIT

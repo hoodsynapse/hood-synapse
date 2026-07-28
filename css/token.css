@@ -1,0 +1,105 @@
+/* Hood Synapse — $SYNAPSE token page.
+   Layered on top of main.css; only what the token page adds lives here. */
+
+nav a.on { color: var(--yellow); }
+
+/* ---------- hero ---------- */
+.tk-hero { padding:70px 0 64px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+.tk-hero::before {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 60% at 78% 40%, rgba(216,245,0,0.10), transparent 62%),
+    radial-gradient(ellipse 60% 50% at 20% 0%, rgba(216,245,0,0.05), transparent 65%);
+}
+.tk-hero .wrap { position:relative; }
+.tk-hero-grid { display:grid; grid-template-columns:1fr 380px; gap:56px; align-items:center; }
+.tk-hero-copy h1 { font-size:clamp(44px,6vw,72px); letter-spacing:-0.045em; margin:14px 0 18px; }
+.tk-hero-copy .lead { margin:0 0 28px; max-width:none; font-size:14px; }
+/* Both of these read as one line on a desktop column and only fold on narrow
+   screens, where folding is the right answer anyway. */
+.tk-band p { max-width:760px; }
+
+.tk-badge {
+  display:inline-flex; align-items:center; gap:9px;
+  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--yellow);
+  border:1px solid rgba(216,245,0,0.34); border-radius:100px; padding:6px 14px;
+  background:rgba(216,245,0,0.05);
+}
+.tk-cta { display:flex; align-items:center; gap:11px; flex-wrap:wrap; margin-bottom:28px; }
+
+.tk-meta { display:flex; gap:30px; flex-wrap:wrap; font-size:12.5px; color:var(--dim); }
+.tk-meta i { display:block; font-style:normal; font-size:10.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--faint); margin-bottom:4px; }
+
+/* ---------- coin ---------- */
+.tk-coin-wrap { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.tk-coin-glow {
+  position:absolute; width:330px; height:330px; border-radius:50%;
+  background:radial-gradient(circle, rgba(216,245,0,0.22), transparent 62%);
+  filter:blur(34px); animation:coinpulse 5s ease-in-out infinite;
+}
+.tk-coin { position:relative; width:300px; height:300px; display:block; animation:coinfloat 7s ease-in-out infinite; }
+@keyframes coinfloat { 50% { transform:translateY(-11px); } }
+@keyframes coinpulse { 50% { opacity:.55; transform:scale(1.06); } }
+
+/* ---------- stats ---------- */
+.tk-stats-sec { padding:56px 0 70px; border-bottom:1px solid var(--border); }
+.tk-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px; }
+.tk-stat { border:1px solid var(--border); border-radius:12px; background:#050505; padding:20px 22px; transition:all .18s; }
+.tk-stat:hover { border-color:var(--border-hi); transform:translateY(-2px); }
+.tk-stat .k { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-bottom:10px; }
+.tk-stat .v { font-size:26px; font-weight:700; letter-spacing:-0.02em; }
+.tk-stat .v.soon { color:var(--faint); }
+
+/* ---------- chart placeholder ---------- */
+.tk-ranges { margin-left:auto; display:flex; gap:6px; }
+.tk-range {
+  font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.05em;
+  background:transparent; color:var(--faint); border:1px solid var(--border);
+  border-radius:6px; padding:4px 10px; cursor:not-allowed; opacity:.7;
+}
+.tk-range.on { color:var(--dim); border-color:var(--border-hi); }
+.tk-chart-body { position:relative; height:230px; }
+.tk-ghost { position:absolute; left:0; right:0; bottom:0; width:100%; height:44%; opacity:.1; }
+.tk-ghost path { fill:none; stroke:var(--yellow); stroke-width:2; vector-effect:non-scaling-stroke;
+  stroke-dasharray:6 7; }
+.tk-chart-empty {
+  position:absolute; inset:0 0 22% 0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:9px; text-align:center; padding:0 24px;
+}
+.tk-chart-empty .t { font-size:13.5px; color:var(--dim); }
+.tk-chart-empty .s { font-size:12px; color:var(--faint); max-width:400px; line-height:1.7; }
+
+/* ---------- utility grid ---------- */
+.tk-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.tk-card { border:1px solid var(--border); border-radius:12px; background:#050505; padding:22px 24px; transition:all .18s; }
+.tk-card:hover { border-color:var(--border-hi); transform:translateY(-2px); }
+.tk-card .h { display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:14.5px; font-weight:600; }
+.tk-card p { font-size:13px; color:var(--dim); line-height:1.75; }
+.soon-tag {
+  margin-left:auto; font-size:9.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); border:1px solid var(--border); border-radius:100px; padding:3px 9px;
+}
+
+/* ---------- closing note ---------- */
+.tk-note-sec { padding:44px 0; border-bottom:1px solid var(--border); }
+.tk-note { font-size:12px; color:var(--faint); line-height:1.85; max-width:760px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-coin, .tk-coin-glow { animation:none; }
+}
+
+@media (max-width:900px) {
+  .tk-hero-grid { grid-template-columns:1fr; gap:40px; }
+  .tk-stats { grid-template-columns:repeat(2,1fr); }
+  .tk-grid { grid-template-columns:1fr 1fr; }
+}
+
+
+@media (max-width:640px){
+  .tk-stats { grid-template-columns:1fr 1fr; }
+  .tk-grid { grid-template-columns:1fr; }
+  .tk-meta { flex-direction:column; gap:6px; }
+  .tk-cta { flex-wrap:wrap; }
+  .tk-coin { width:200px; height:200px; }
+}

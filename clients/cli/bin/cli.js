@@ -17,6 +17,25 @@ const green = c('32');
 
 const num = (n) => (n == null ? '—' : Number(n).toLocaleString('en-US'));
 const pad = (s, n) => String(s).padEnd(n);
+const rpad = (s, n) => String(s).padStart(n);
+
+// A memecoin trades at $0.0000005 and a tokenized share at $332.39 in the same
+// column, so precision follows magnitude rather than a fixed number of decimals.
+function money(v) {
+  if (v == null || !isFinite(v)) return '—';
+  if (v >= 1) return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (v >= 0.01) return '$' + v.toFixed(4);
+  if (v >= 0.000001) return '$' + v.toFixed(8).replace(/0+$/, '');
+  return '$' + v.toExponential(2);
+}
+
+function compact(v) {
+  if (v == null || !isFinite(v)) return '—';
+  if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v / 1e3).toFixed(1) + 'K';
+  return '$' + Math.round(v);
+}
 
 function die(msg) {
   console.error(red('error: ') + msg);
@@ -149,6 +168,37 @@ const commands = {
     console.log('');
   },
 
+  async tokens(f) {
+    const kind = f.kind || f._[0] || null;
+    const limit = f.limit || 15;
+    const d = await get(`/tokens?limit=${limit}` + (kind ? `&kind=${kind}` : ''));
+    if (f.json) return emit(d, f);
+
+    console.log('');
+    console.log(bold('  Tokens by activity') + dim(`  ·  ${num(d.count)} shown${kind ? ` · ${kind}` : ''}`));
+    console.log('');
+    console.log(dim(`  ${pad('', 10)}${rpad('PRICE', 13)}${rpad('24H', 9)}${rpad('LIQUIDITY', 12)}${rpad('HOLDERS', 10)}  NAME`));
+
+    for (const t of d.tokens) {
+      const chg = t.priceChange24h;
+      const chgTxt = chg == null ? '—' : (chg > 0 ? '+' : '') + chg.toFixed(1) + '%';
+      const paint = chg == null ? dim : chg > 0 ? green : red;
+      console.log(
+        '  ' + y(pad(t.symbol || '?', 8))
+        + rpad(money(t.priceUsd), 13)
+        + paint(rpad(chgTxt, 9))
+        + rpad(compact(t.liquidityUsd), 12)
+        + rpad(t.holders == null ? '—' : num(t.holders), 10)
+        + '  ' + dim(String(t.name || '').slice(0, 38))
+      );
+    }
+
+    console.log('');
+    console.log(dim('  Price is the on-chain DEX price from the deepest pair on this chain,'));
+    console.log(dim('  not a reference exchange quote. Read liquidity beside it.'));
+    console.log('');
+  },
+
   async status(f) {
     const d = await get('/index-status');
     if (f.json) return emit(d, f);
@@ -178,17 +228,20 @@ const commands = {
     ${y('gas')}                gas breakdown
     ${y('block')} [n|latest]   a single block, orbit fields included
     ${y('blocks')}             recent blocks from the index
+    ${y('tokens')} [kind]      tokens by activity, with price and liquidity
     ${y('daily')}              daily activity chart
     ${y('status')}             how far the index reaches
     ${y('help')}               this screen
 
   ${bold('OPTIONS')}
     --json             raw JSON output
-    --limit <n>        rows for ${dim('blocks')} ${dim('(default 10)')}
+    --limit <n>        rows for ${dim('blocks')} / ${dim('tokens')}
+    --kind <k>         rwa · equity · fund · private · stable · meme · infra
     --days <n>         days for ${dim('daily')} ${dim('(default 14)')}
 
   ${bold('EXAMPLES')}
     ${dim('$')} npx hoodsynapse stats
+    ${dim('$')} npx hoodsynapse tokens rwa
     ${dim('$')} npx hoodsynapse block 20061111
     ${dim('$')} npx hoodsynapse daily --days 30
     ${dim('$')} npx hoodsynapse blocks --json | jq '.blocks[0]'

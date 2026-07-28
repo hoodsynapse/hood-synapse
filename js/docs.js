@@ -2,12 +2,13 @@
 // Reads the live chain and the Hood Synapse index. No key, no build step.
 
 (function(){
-  var RPC='https://rpc.mainnet.chain.robinhood.com';
-  function call(m,p){return fetch(RPC,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({jsonrpc:'2.0',method:m,params:p||[],id:1})}).then(function(r){return r.json();}).then(function(j){return j.result;});}
-  function tick(){ call('eth_blockNumber').then(function(h){
-    if(h) document.getElementById('hb').textContent=parseInt(h,16).toLocaleString('en-US');
-  }).catch(function(){}); }
+  // Read through this site's API rather than posting to the chain's RPC from the
+  // visitor's browser: that RPC sits behind Cloudflare, which refuses some mobile and
+  // in-app-browser connections, and a blank block number reads as a dead site.
+  function tick(){ fetch('/api/stats',{cache:'no-store'}).then(function(r){return r.json();})
+    .then(function(d){
+      if(d && d.latestBlock) document.getElementById('hb').textContent=d.latestBlock.toLocaleString('en-US');
+    }).catch(function(){}); }
   tick(); setInterval(tick,5000);
 
   var links=[].slice.call(document.querySelectorAll('.rail a'));

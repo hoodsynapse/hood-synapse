@@ -12,8 +12,13 @@ async function rpc(method, params = []) {
   return j.result;
 }
 
-const dec = (h) => (h == null ? null : parseInt(h, 16));
-const gwei = (h) => (h == null ? null : Number((parseInt(h, 16) / 1e9).toFixed(6)));
+// Anyone can deploy a contract, so anyone can return junk from decimals(). parseInt
+// turns that junk into NaN, which JSON quietly renders as null but Postgres rejects
+// outright — one bad contract was enough to halt the token scanner indefinitely.
+// Unparseable means unknown, and unknown is null everywhere.
+const num = (v) => (Number.isFinite(v) ? v : null);
+const dec = (h) => (h == null ? null : num(parseInt(h, 16)));
+const gwei = (h) => (h == null ? null : num(Number((parseInt(h, 16) / 1e9).toFixed(6))));
 
 // ArbOS internal bookkeeping txs — filtered out of userTxCount
 function isSystemTx(t) {

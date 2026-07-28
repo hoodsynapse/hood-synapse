@@ -16,7 +16,6 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { -webkit-text-size-adjust:100%; text-size-adjust:100%; scroll-behavior:smooth; background:var(--bg); }
-body { max-height:1000000px; }
 body {
   background: transparent; color: var(--text);
   font-family: var(--mono); font-size:15px; line-height:1.6;
@@ -70,7 +69,7 @@ nav a:hover { color: var(--yellow); }
 .hero-head { text-align:center; max-width:720px; margin:0 auto; }
 h1 { font-size:clamp(34px,5vw,58px); font-weight:700; line-height:1.08; letter-spacing:-0.035em; margin-bottom:18px; }
 h1 em { font-style:normal; color:var(--yellow); }
-.lead { font-size:15px; color:var(--dim); line-height:1.75; max-width:520px; margin:0 auto 26px; }
+.lead { font-size:15px; color:var(--dim); line-height:1.75; max-width:600px; margin:0 auto 26px; }
 .lead b { color:var(--text); font-weight:600; }
 .hero-cta { display:flex; justify-content:center; align-items:center; gap:11px; margin-bottom:8px; }
 .btn-gh { display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:14px; font-weight:600;
@@ -87,13 +86,13 @@ h1 em { font-style:normal; color:var(--yellow); }
 .map svg.wires path { fill:none; stroke:rgba(216,245,0,0.35); stroke-width:1.5; stroke-dasharray:3 7; animation:dashflow 24s linear infinite; }
 @keyframes dashflow { to { stroke-dashoffset:-400; } }
 .node {
-  position:absolute; transform:translate(-50%,-50%);
+  position:absolute; display:block; transform:translate(-50%,-50%);
   background:#050505; backdrop-filter:blur(6px);
   border:1px solid var(--border-hi); border-radius:13px;
   padding:16px 22px; text-align:center; min-width:158px;
   transition:border-color .2s;
 }
-.node:hover { border-color:var(--yellow); }
+.node:hover { border-color:var(--yellow); transform:translate(-50%,-50%) translateY(-2px); }
 .node::after { content:""; position:absolute; top:9px; right:9px; width:5px; height:5px; border-radius:50%; background:var(--yellow); opacity:.7; }
 .node .nt { font-size:13.5px; font-weight:700; color:var(--text); }
 .node .ns { font-size:10.5px; color:var(--yellow-dim); margin-top:5px; letter-spacing:0.06em; }
@@ -324,22 +323,63 @@ footer { padding:44px 0 54px; }
 .tok-head { display:flex; align-items:center; gap:10px; padding:13px 18px; border-bottom:1px solid var(--border);
   font-size:11.5px; letter-spacing:0.1em; color:var(--faint); text-transform:uppercase; }
 .tok-head .r { margin-left:auto; text-transform:none; letter-spacing:0; color:var(--dim); }
-.tok-row { display:grid; grid-template-columns:30px 110px 1fr 92px 88px; gap:14px; align-items:center;
+.tok-row { display:grid; grid-template-columns:24px 24px minmax(0,1fr) 66px 88px 58px 76px 76px 66px 70px; gap:9px; align-items:center;
   padding:12px 18px; border-bottom:1px solid rgba(38,38,32,.55); font-size:13px; animation:slide .3s ease; }
 .tok-row:last-child { border-bottom:none; }
 .tok-row .n { color:var(--faint); font-size:11.5px; }
 .tok-row .sym { color:var(--yellow); font-weight:700; }
-.tok-row .nm { color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.tok-row .tx { text-align:right; color:var(--text); }
-.tok-row .tx span { color:var(--faint); font-size:11px; }
+.tok-id { display:flex; flex-direction:column; gap:1px; min-width:0; }
+.tok-row .nm { color:var(--faint); font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tok-row .tx { text-align:right; color:var(--dim); font-size:12.5px; }
+
+/* market columns */
+.tok-row .price { text-align:right; color:var(--text); font-size:12.5px; font-variant-numeric:tabular-nums; }
+.tok-row .chg { text-align:right; font-size:12.5px; color:var(--faint); font-variant-numeric:tabular-nums; }
+.tok-row .chg.up { color:#7FE6A6; }
+.tok-row .chg.down { color:#FF8B7A; }
+.tok-row .liq { text-align:right; color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+.tok-row .vol { text-align:right; color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+.tok-row .hold { text-align:right; color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+.tok-meta { display:none; }
+
+.tok-cols { display:grid; grid-template-columns:24px 24px minmax(0,1fr) 66px 88px 58px 76px 76px 66px 70px; gap:9px;
+  padding:9px 18px; border-bottom:1px solid var(--border); background:rgba(255,255,255,.012);
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
+.tok-cols .num { text-align:right; }
+
+.tok-foot { margin-top:14px; font-size:11.5px; line-height:1.75; color:var(--faint); max-width:760px; }
+.tok-foot b { color:var(--dim); font-weight:600; }
 .tok-kind { font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:5px;
   text-align:center; border:1px solid var(--border-hi); color:var(--dim); }
 .tok-kind.equity  { color:#7FD1FF; border-color:rgba(127,209,255,.3); background:rgba(127,209,255,.07); }
 .tok-kind.fund    { color:#C9A6FF; border-color:rgba(201,166,255,.3); background:rgba(201,166,255,.07); }
 .tok-kind.private { color:#FFC27F; border-color:rgba(255,194,127,.3); background:rgba(255,194,127,.07); }
 .tok-kind.stable  { color:#7FE6A6; border-color:rgba(127,230,166,.3); background:rgba(127,230,166,.07); }
-.tok-kind.native  { color:var(--yellow-dim); border-color:rgba(168,191,0,.28); background:rgba(168,191,0,.06); }
+.tok-kind.meme    { color:var(--yellow-dim); border-color:rgba(168,191,0,.28); background:rgba(168,191,0,.06); }
+.tok-kind.infra   { color:#9BB4C4; border-color:rgba(155,180,196,.3); background:rgba(155,180,196,.07); }
+.tok-kind.lp      { color:#B9AE96; border-color:rgba(185,174,150,.28); background:rgba(185,174,150,.06); }
+
+.tok-row.unpriced { cursor:help; }
+.tok-row.unpriced .price, .tok-row.unpriced .chg,
+.tok-row.unpriced .liq, .tok-row.unpriced .vol { color:var(--faint); }
+.tok-box.refreshing #tok-list { opacity:.45; transition:opacity .12s; }
 .tok-empty { padding:34px 18px; text-align:center; color:var(--faint); font-size:13px; }
+
+/* logo, or a monogram when the chain has no artwork for the token */
+.tok-logo { position:relative; display:flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:7px; overflow:hidden; flex-shrink:0;
+  font-size:9px; font-weight:700; letter-spacing:.02em;
+  background:#141410; border:1px solid var(--border-hi); color:var(--faint); }
+.tok-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  background:#141410; opacity:0; transition:opacity .22s ease; }
+.tok-logo img.on { opacity:1; }
+.tok-logo.equity  { color:#7FD1FF; border-color:rgba(127,209,255,.28); }
+.tok-logo.fund    { color:#C9A6FF; border-color:rgba(201,166,255,.28); }
+.tok-logo.private { color:#FFC27F; border-color:rgba(255,194,127,.28); }
+.tok-logo.stable  { color:#7FE6A6; border-color:rgba(127,230,166,.28); }
+.tok-logo.meme    { color:var(--yellow-dim); border-color:rgba(168,191,0,.24); }
+.tok-logo.infra   { color:#9BB4C4; border-color:rgba(155,180,196,.26); }
+.tok-logo.lp      { color:#B9AE96; border-color:rgba(185,174,150,.24); }
 @media (max-width:600px){
   .tok-row { grid-template-columns:24px 84px 1fr 72px; }
   .tok-row .tx { display:none; }
@@ -435,3 +475,99 @@ header, section, footer, .band { position:relative; z-index:1; }
 .agent-ask q { color:var(--text); font-style:italic; }
 .agent-ask q::before, .agent-ask q::after { content:'"'; color:var(--faint); }
 @media (max-width:860px){ .agent-grid { grid-template-columns:1fr; } .agent-tool { grid-template-columns:1fr; gap:3px; } }
+
+/* ---------- footer ---------- */
+.fcols { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:36px; padding-bottom:34px; }
+.fcol { display:flex; flex-direction:column; gap:9px; }
+.fcol .fh { font-size:10.5px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; margin-bottom:4px; }
+.fcol a { font-size:13px; color:var(--dim); transition:color .15s; }
+.fcol a:hover { color:var(--yellow); }
+.fcol-brand .fbrand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; margin-bottom:4px; }
+.fcol-brand .fbrand svg { width:22px; height:22px; }
+.ftag { font-size:12.5px; color:var(--faint); line-height:1.65; max-width:300px; margin:0 0 6px; }
+.fsocial { display:flex; gap:9px; margin-top:4px; }
+.fsocial a { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px;
+  border:1px solid var(--border-hi); border-radius:8px; color:var(--dim); transition:all .16s; }
+.fsocial a:hover { color:#0A0A08; background:var(--yellow); border-color:var(--yellow); }
+.fbot { display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding-top:20px; border-top:1px solid var(--border); font-size:12px; color:var(--faint); }
+.fbot .cr b { color:var(--dim); font-weight:600; }
+.fbot .fnote { margin-left:auto; }
+@media (max-width:860px){
+  .fcols { grid-template-columns:1fr 1fr; gap:28px; }
+  .fcol-brand { grid-column:1 / -1; }
+  .fbot .fnote { margin-left:0; }
+}
+
+/* ---------- $SYNAPSE teaser ---------- */
+.tkt { display:grid; grid-template-columns:1fr 260px; gap:48px; align-items:center; }
+.tkt-copy h2 { margin-bottom:16px; }
+.tkt-coin { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.tkt-glow { position:absolute; width:230px; height:230px; border-radius:50%;
+  background:radial-gradient(circle, rgba(216,245,0,0.20), transparent 62%);
+  filter:blur(28px); animation:coinpulse 5s ease-in-out infinite; }
+.tkt-coin img { position:relative; width:200px; height:200px; display:block; transition:transform .25s; }
+.tkt-coin:hover img { transform:translateY(-4px) scale(1.03); }
+.tkt-tag { position:relative; margin-top:16px; font-size:10.5px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--faint); }
+@keyframes coinpulse { 50% { opacity:.55; transform:scale(1.06); } }
+@media (prefers-reduced-motion: reduce){ .tkt-glow { animation:none; } }
+@media (max-width:860px){ .tkt { grid-template-columns:1fr; gap:32px; } }
+
+
+/* ═══════════ small screens ═══════════
+   Most of the page already reflows on its own. Three things do not: the console,
+   the token table and the code samples are all fixed-width by nature, and at 375px
+   they were being clipped — the data was not scrolled off, it was simply gone. */
+@media (max-width:640px){
+
+  /* the console is a terminal; letting it scroll sideways is what a terminal does */
+  .term-body { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .term-body > * { min-width:max-content; }
+  .term-bar { gap:7px; }
+  .term-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+  .term-live { flex-shrink:0; }
+
+  /* code samples scroll rather than truncate */
+  pre { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+  /* The token table drops to two lines per row. Rank, category and transfer count
+     move out of the way, but price keeps liquidity beside it — a price shown with
+     no idea of the depth behind it is the one number on this page worth mistrusting. */
+  .tok-cols { display:none; }
+  .tok-row {
+    grid-template-columns:26px minmax(0,1fr) auto;
+    grid-template-areas:
+      "logo sym  price"
+      "logo liq  chg"
+      "meta meta meta";
+    gap:2px 10px;
+    padding:12px 14px;
+  }
+  .tok-row .n,
+  .tok-row .tok-kind,
+  .tok-row .vol,
+  .tok-row .hold,
+  .tok-row .tx { display:none; }
+  .tok-meta {
+    display:block; grid-area:meta; margin-top:5px; padding-top:6px;
+    border-top:1px solid rgba(38,38,32,.7);
+    font-size:10.5px; color:var(--faint); letter-spacing:.01em;
+  }
+  .tok-row .tok-logo { grid-area:logo; align-self:center; }
+  .tok-id { grid-area:sym; }
+  .tok-id .nm { display:none; }
+  .tok-row .price { grid-area:price; }
+  .tok-row .liq { grid-area:liq; text-align:left; font-size:11.5px; }
+  .tok-row .liq::before { content:"liq "; color:var(--faint); }
+  .tok-row .chg { grid-area:chg; }
+
+  .tok-tab { font-size:11.5px; padding:6px 11px; }
+  .tok-foot { font-size:11px; }
+
+  /* the node map reads better stacked than as two clipped columns */
+  .map { grid-template-columns:1fr; }
+
+  section { padding:56px 0; }
+  .wrap { padding:0 18px; }
+}

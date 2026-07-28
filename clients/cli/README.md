@@ -39,9 +39,14 @@ npm install -g hoodsynapse
 | `gas` | Gas breakdown, including why priority fees are zero here |
 | `block [n\|latest]` | A single block, with Arbitrum Orbit fields decoded |
 | `blocks` | Recent blocks from the Hood Synapse index |
+| `tokens [kind]` | Tokens by activity with price, liquidity and holders |
 | `daily` | Daily activity, drawn as a chart in your terminal |
 | `status` | How far the index reaches, and how far behind the tip |
 | `help` | Usage |
+
+`tokens` takes a category: `rwa`, `equity`, `fund`, `private`, `stable`, `meme` or `infra`.
+Price is the on-chain DEX price from the deepest pair on this chain, not a reference
+exchange quote — read the liquidity column beside it.
 
 ## Options
 
@@ -58,6 +63,10 @@ npm install -g hoodsynapse
 npx hoodsynapse stats
 
 # a specific block, orbit internals included
+npx hoodsynapse tokens rwa
+```
+
+```bash
 npx hoodsynapse block 20061111
 
 # a month of activity as a terminal chart
@@ -90,8 +99,5 @@ Nothing here asks for trust. Check any number against the chain.
 
 Uses the public Hood Synapse API by default. Point it elsewhere with `HOODSYNAPSE_API`.
 Requires Node 18+.
-
-Hood Synapse is an independent project. Not affiliated with, endorsed by, or sponsored by
-Robinhood Markets, Inc.
 
 MIT © Hood Synapse
