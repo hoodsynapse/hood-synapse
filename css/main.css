@@ -571,3 +571,5 @@ header, section, footer, .band { position:relative; z-index:1; }
   section { padding:56px 0; }
   .wrap { padding:0 18px; }
 }
+
+.ext { display:inline-block; margin-left:3px; vertical-align:0; opacity:.7; }

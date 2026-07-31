@@ -150,11 +150,30 @@ the index holds — check it against the chain any time.
 ## $SYNAPSE
 
 Reading Robinhood Chain stays free — the API, the CLI and the MCP server need no key and no
-account, and that does not change. **$SYNAPSE** is planned for what sits above that line:
-heavier usage, index priority, and settlement between agents.
+account, and that does not change. **$SYNAPSE** is for what sits above that line: heavier
+usage, index priority, and metered access for agents reading the chain at scale.
 
-It has not launched. There is no contract address, no price, and no sale.
-[hoodsynapse.xyz/token](https://hoodsynapse.xyz/token) has the details.
+| | |
+| --- | --- |
+| Contract | `0x1E75e55Bf4b2d77B62f07D5AA86401057584aADd` |
+| Symbol | `SYNAPSE` |
+| Name | Hood Synapse by Virtuals |
+| Decimals | 18 |
+| Chain | Robinhood Chain, chainId 4663 |
+| Launched on | Virtuals Protocol |
+
+Verify the address against the chain rather than trusting this file:
+
+```bash
+curl -X POST https://rpc.mainnet.chain.robinhood.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{"to":"0x1E75e55Bf4b2d77B62f07D5AA86401057584aADd","data":"0x95d89b41"},"latest"]}'
+```
+
+That returns the token's own `symbol()`. Anything that does not decode to `SYNAPSE` is not
+this token.
+
+The utility above is planned, not shipped. [hoodsynapse.xyz/token](https://hoodsynapse.xyz/token)
+tracks what has actually landed. $SYNAPSE is classified by the same rules as every other
+token in this index, with no exception made for sharing the name.
 
 ## Network
 
